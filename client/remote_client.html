@@ -358,11 +358,6 @@
         <div class="panel" id="panel-media">
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('exec', {command: 'flatpak run tv.kodi.Kodi > /dev/null 2>&1 &'})">🎬 Kodi</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <div class="input-fields">
                     <button onclick="sendCommand('press', {key: 'volumeup'})">🔊</button>
                     <button onclick="sendCommand('press', {key: 'volumedown'})">🔈</button>
                 </div>
@@ -378,6 +373,22 @@
                 <div class="input-fields">
                     <button id="spaceButton" onclick="sendCommand('press', {key: 'space'})">Space</button>
                     <button onclick="sendCommand('press', {key: 'enter'})">Enter</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: '/'})">/</button>
+                    <button onclick="sendCommand('press', {key: 'i'})">I</button>
+                    <button onclick="sendCommand('press', {key: 'f'})">F</button>
+                    <button onclick="sendCommand('press', {key: 'c'})">C</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: '&gt;'})">&gt;</button>
+                    <button onclick="sendCommand('press', {key: '&lt;'})">&lt;</button>
+                    <button onclick="sendCommand('press', {key: 'win'})">Win</button>
+                    <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
                 </div>
             </div>
         </div>
@@ -452,22 +463,6 @@
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: '/'})">/</button>
-                    <button onclick="sendCommand('press', {key: 'i'})">I</button>
-                    <button onclick="sendCommand('press', {key: 'f'})">F</button>
-                    <button onclick="sendCommand('press', {key: 'c'})">C</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: '&gt;'})">&gt;</button>
-                    <button onclick="sendCommand('press', {key: '&lt;'})">&lt;</button>
-                    <button onclick="sendCommand('press', {key: 'win'})">Win</button>
-                    <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
                 </div>
             </div>
         </div>
