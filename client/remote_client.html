@@ -190,13 +190,16 @@
             flex: 1 1 120px; /* Allow buttons to grow, min width 120px */
             padding: 10px 15px;
             font-size: 2rem; /* Smaller font size than main action buttons */
-            height: auto; /* Allow height to adjust based on content */
+            height: 100px; /* Taller tap targets, still shorter than the 120px action buttons */
             background-color: #555; /* Default inactive color */
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .touchpad-mode-btn:hover { /* Changed from .touchpad-mode-buttons button:hover */
@@ -247,12 +250,15 @@
         }
         .tabs .tab-btn {
             flex: 1 1 0;
-            height: auto;
+            height: 100px;
             font-size: 2rem;
             padding: 10px 15px;
             border-radius: 10px;
             background-color: #95a5a6;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .tabs .tab-btn.active {
             background-color: #3498db;
