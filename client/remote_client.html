@@ -340,16 +340,16 @@
         </div>
 
         <div class="panel active" id="panel-touch">
-            <div class="touchpad-mode-buttons">
-                <button class="touchpad-mode-btn" data-mode="mouse">Mouse</button>
-                <button class="touchpad-mode-btn" data-mode="scroll">Scroll</button>
-                <button class="touchpad-mode-btn" data-mode="array">Array</button>
-            </div>
             <div class="input-group">
                 <div class="input-fields">
                     <button onclick="sendCommand('click', {'button': 'right'})">⏳ Right Click</button>
                     <button onclick="sendCommand('hotkey', {keys: ['win', 'shift', 'space']})">Top Bar</button>
                 </div>
+            </div>
+            <div class="touchpad-mode-buttons">
+                <button class="touchpad-mode-btn" data-mode="mouse">Mouse</button>
+                <button class="touchpad-mode-btn" data-mode="scroll">Scroll</button>
+                <button class="touchpad-mode-btn" data-mode="array">Array</button>
             </div>
             <div id="touchpad">
                 <p>Touch to click, swing to move mouse</p>
