@@ -213,176 +213,260 @@
             background-color: #28a745; /* Keep active color on hover */
             transform: none;
         }
+
+        /* NEW: Sticky topbar with tabs */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            background-color: #fff;
+            padding-bottom: 12px;
+        }
+        .status-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .status-row .btn-group {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .status-row .btn-group button {
+            height: auto;
+            font-size: 1rem;
+            padding: 6px 14px;
+            border-radius: 8px;
+            flex: 0 0 auto;
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+        }
+        .tabs .tab-btn {
+            flex: 1 1 0;
+            height: 52px;
+            font-size: 1.3rem;
+            padding: 4px;
+            border-radius: 10px;
+            background-color: #95a5a6;
+            color: white;
+        }
+        .tabs .tab-btn.active {
+            background-color: #3498db;
+        }
+        .tabs .tab-btn:hover {
+            background-color: #7f8c8d;
+        }
+        .tabs .tab-btn.active:hover {
+            background-color: #2980b9;
+        }
+        .panel {
+            display: none;
+        }
+        .panel.active {
+            display: block;
+        }
+        .panel .input-group {
+            margin-top: 14px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                margin: 0;
+            }
+            .container {
+                max-width: 100%;
+                width: 100%;
+                padding: 16px;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- <h1>PyAutoGUI Web Control</h1> -->
-        <p>
-            <span class="status-indicator" id="statusIndicator"></span> Server Status: <span id="statusText" style="color: red;">Disconnected</span>
-        </p>
-
-        <div class="input-group">
-            <div style="display: none" class="input-fields">            
+        <div class="topbar">
+            <div class="status-row">
+                <span class="status-indicator" id="statusIndicator"></span>
+                Server: <span id="statusText" style="color: red;">Disconnected</span>
+                <span class="btn-group">
+                    <button id="connectBtn">Connect</button>
+                    <button id="disconnectBtn" disabled>Disconnect</button>
+                </span>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="touch">Touch</button>
+                <button class="tab-btn" data-tab="media">Media</button>
+                <button class="tab-btn" data-tab="browser">Browser</button>
+                <button class="tab-btn" data-tab="type">Type</button>
+            </div>
+            <div style="display: none" class="input-fields">
                 <label for="serverIp">Server IP:</label>
                 <input type="text" id="serverIp">
                 <label for="serverPort">Port:</label>
                 <input type="number" id="serverPort" value="9999">
             </div>
-            <div class="input-fields">       
-                <button id="connectBtn">Connect</button>
-                <button id="disconnectBtn" disabled>Disconnect</button>
-            </div>
         </div>
-        <hr>
-        <div class="input-fields">
-            <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">✂️</button>
-            <button onclick="sendCommand('hotkey', {keys: ['alt', 'f4']})">💣</button>
-        </div>
-        <hr>
-        
-        <div class="input-group">
-            <div class="input-fields">
-                <button onclick="sendCommand('exec', {command: 'flatpak run tv.kodi.Kodi > /dev/null 2>&1 &'})">🎬</button>
+
+        <div class="panel active" id="panel-touch">
+            <div class="touchpad-mode-buttons">
+                <button class="touchpad-mode-btn" data-mode="mouse">Mouse</button>
+                <button class="touchpad-mode-btn" data-mode="scroll">Scroll</button>
+                <button class="touchpad-mode-btn" data-mode="array">Array</button>
             </div>
-            <div class="input-fields">
-                <button  onclick="sendCommand('hotkey', {keys: ['ctrl', 'a']})">All</button>
+            <div id="touchpad">
+                <p>Touch to click, swing to move mouse</p>
             </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">  
-                <button onclick="sendCommand('press', {key: 'tab'})">tab</button>
-                <button onclick="sendCommand('hotkey', {keys: ['shift', 'tab']})">tab⬅️</button>
-            </div>
-            <div class="input-fields">  
-                <button onclick="sendCommand('press', {key: 'ctrl'})">Ctrl</button>
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'space']})">🔃</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'z']})">↩️</button>
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'z']})">↪️</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 't']})">📄➕</button>
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">📄❌</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', '-']})">🔎-</button>
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', '=']})">🔎+</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'tab']})">📄⏭️</button>
-                <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'tab']})">📄⏮️</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <button  onclick="sendCommand('press', {key: 'backspace'})">Back</button>
-                <button  onclick="sendCommand('press', {key: 'delete'})">Del</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: 'f2'})">F2</button>
-                <button onclick="sendCommand('press', {key: 'f5'})">F5</button>
-                <button onclick="sendCommand('press', {key: 'f6'})">F6</button>
-                <button onclick="sendCommand('press', {key: 'f11'})">F11</button>
-            </div>
-            <div class="input-fields">
-                <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
-                <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">Pgup</button>
-            </div>
-            <div class="input-fields">
-                <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
-                <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">Pgdn</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: '/'})">/</button>
-                <button onclick="sendCommand('press', {key: 'i'})">I</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: 'f'})">F</button>
-                <button onclick="sendCommand('press', {key: 'c'})">C</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: '&gt;'})">&gt;</button>
-                <button onclick="sendCommand('press', {key: '&lt;'})">&lt;</button>
-            </div>
-        </div>
-        <hr>
-        
-        <div class="input-group">
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: 'volumeup'})">🔊</button>
-                <button onclick="sendCommand('press', {key: 'volumedown'})">🔈</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: 'prevtrack'})">⏮</button>
-                <button onclick="sendCommand('press', {key: 'playpause'})">⏯</button>
-                <button onclick="sendCommand('press', {key: 'nexttrack'})">⏭</button>
-            </div>
-            <div class="input-fields">
-                <button onclick="sendCommand('hotkey', {keys: ['alt', 'left']})">⬅️</button>
-                <button onclick="sendCommand('hotkey', {keys: ['alt', 'right']})">➡️</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <button onclick="sendCommand('press', {key: 'win'})">Win</button>
-                <button id="spaceButton" onclick="sendCommand('press', {key: 'space'})"> </button>
-            </div>
-            <div class="input-fields">
-                <button  onclick="sendCommand('press', {key: 'esc'})">Esc</button>
-                <button onclick="sendCommand('press', {key: 'enter'})">Enter</button>
-            </div>
-        </div>
-        <hr>
-        <div class="touchpad-mode-buttons">
-            <button class="touchpad-mode-btn" data-mode="mouse">Mouse</button>
-            <button class="touchpad-mode-btn" data-mode="scroll">Scroll</button>
-            <button class="touchpad-mode-btn" data-mode="array">Array</button>
-        </div>
-        <div id="touchpad">
-            <p>Touch to click, swing to move mouse</p>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <!-- <button onclick="sendCommand('click', {})">👆</button> -->
-                <button onclick="sendCommand('click', {'button': 'right'})">⏳</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">       
-                <input type="text" placeholder="text some" id="typeText">
-                <button onclick="sendCommand('type', {text: document.getElementById('typeText').value.trim()})">Type</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div  class="input-fields">
-                <input type="text" id="pressKey" placeholder="e.g., enter, esc, space">
-                <button onclick="sendCommand('press', {key: document.getElementById('pressKey').value.trim()})">Press</button>
-            </div>
-        </div>
-        <hr>
-        <div class="input-group">
-            <div class="input-fields">
-                <input type="text" id="hotkeyKeys" placeholder="space separated, e.g., ctrl alt del">
-                <button  onclick="sendCommand('hotkey', {keys: document.getElementById('hotkeyKeys')
-                        .value.trim().split(' ')})">Hotkey</button>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('click', {'button': 'right'})">⏳ Right Click</button>
+                </div>
             </div>
         </div>
 
-        <hr>
+        <div class="panel" id="panel-media">
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('exec', {command: 'flatpak run tv.kodi.Kodi > /dev/null 2>&1 &'})">🎬 Kodi</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'volumeup'})">🔊</button>
+                    <button onclick="sendCommand('press', {key: 'volumedown'})">🔈</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'prevtrack'})">⏮</button>
+                    <button onclick="sendCommand('press', {key: 'playpause'})">⏯</button>
+                    <button onclick="sendCommand('press', {key: 'nexttrack'})">⏭</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button id="spaceButton" onclick="sendCommand('press', {key: 'space'})">Space</button>
+                    <button onclick="sendCommand('press', {key: 'enter'})">Enter</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-browser">
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">✂️ Close</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['alt', 'f4']})">💣 Quit</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 't']})">📄➕</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">📄❌</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'tab']})">📄⏭️</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'tab']})">📄⏮️</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', '-']})">🔎-</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', '=']})">🔎+</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'z']})">↩️ Undo</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'z']})">↪️ Redo</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['alt', 'left']})">⬅️ Back</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['alt', 'right']})">➡️ Fwd</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'a']})">All</button>
+                    <button onclick="sendCommand('press', {key: 'tab'})">Tab</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['shift', 'tab']})">⇧Tab</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'ctrl'})">Ctrl</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'space']})">🔃 IME</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'backspace'})">Backspace</button>
+                    <button onclick="sendCommand('press', {key: 'delete'})">Del</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'f2'})">F2</button>
+                    <button onclick="sendCommand('press', {key: 'f5'})">F5</button>
+                    <button onclick="sendCommand('press', {key: 'f6'})">F6</button>
+                    <button onclick="sendCommand('press', {key: 'f11'})">F11</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: '/'})">/</button>
+                    <button onclick="sendCommand('press', {key: 'i'})">I</button>
+                    <button onclick="sendCommand('press', {key: 'f'})">F</button>
+                    <button onclick="sendCommand('press', {key: 'c'})">C</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: '&gt;'})">&gt;</button>
+                    <button onclick="sendCommand('press', {key: '&lt;'})">&lt;</button>
+                    <button onclick="sendCommand('press', {key: 'win'})">Win</button>
+                    <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" id="panel-type">
+            <div class="input-group">
+                <div class="input-fields">
+                    <input type="text" placeholder="text some" id="typeText">
+                    <button onclick="sendCommand('type', {text: document.getElementById('typeText').value.trim()})">Type</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <input type="text" id="pressKey" placeholder="e.g., enter, esc, space">
+                    <button onclick="sendCommand('press', {key: document.getElementById('pressKey').value.trim()})">Press</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <input type="text" id="hotkeyKeys" placeholder="space separated, e.g., ctrl alt del">
+                    <button onclick="sendCommand('hotkey', {keys: document.getElementById('hotkeyKeys')
+                            .value.trim().split(' ')})">Hotkey</button>
+                </div>
+            </div>
+        </div>
 
         <h2>Messages:</h2>
         <div id="messages"></div>
@@ -670,7 +754,21 @@
             touchpad.classList.remove('active');
         });
         // --- END NEW Touchpad Logic ---
-    
+
+        // --- NEW: Tab switching ---
+        function switchTab(name) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === name);
+            });
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.toggle('active', panel.id === 'panel-' + name);
+            });
+        }
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+        });
+        switchTab('touch');
+        // --- END NEW: Tab switching ---
     </script>
 </body>
 </html>
