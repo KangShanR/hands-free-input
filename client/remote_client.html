@@ -247,9 +247,9 @@
         }
         .tabs .tab-btn {
             flex: 1 1 0;
-            height: 52px;
-            font-size: 1.3rem;
-            padding: 4px;
+            height: auto;
+            font-size: 2rem;
+            padding: 10px 15px;
             border-radius: 10px;
             background-color: #95a5a6;
             color: white;
@@ -694,6 +694,13 @@
 
         touchpad.addEventListener('touchstart', (e) => {
             e.preventDefault(); // Prevent scrolling/zooming on the touchpad area
+            if (e.touches.length === 2 && twoFingerId === null) {
+                multiTouchSeen = true;
+                const touch = e.changedTouches[e.changedTouches.length - 1];
+                twoFingerId = touch.identifier;
+                twoFingerStartX = touch.clientX;
+                return;
+            }
             if (e.touches.length === 1) {
                 count ++;
                 lastTouchX = e.touches[0].clientX;
@@ -707,6 +714,28 @@
         touchpad.addEventListener('touchmove', (e) => {
             console.log("move touch start, mode:", currentTouchpadMode);
             e.preventDefault(); // Prevent scrolling/zooming on the touchpad area
+            if (e.touches.length === 2 && twoFingerId !== null) {
+                let tracked = null;
+                for (let i = 0; i < e.touches.length; i++) {
+                    if (e.touches[i].identifier === twoFingerId) {
+                        tracked = e.touches[i];
+                        break;
+                    }
+                }
+                if (tracked) {
+                    const swipeX = tracked.clientX - twoFingerStartX;
+                    if (swipeX > twoFingerThreshold) {
+                        twoFingerId = null;
+                        twoFingerStartX = null;
+                        switchTabRelative(-1);
+                    } else if (swipeX < -twoFingerThreshold) {
+                        twoFingerId = null;
+                        twoFingerStartX = null;
+                        switchTabRelative(1);
+                    }
+                }
+                return;
+            }
             if (e.touches.length === 1 && lastTouchX !== null && 
                     currentTouchpadMode == 'mouse') {
                 count ++;
@@ -729,6 +758,30 @@
 
         touchpad.addEventListener('touchend', (e) => {
             e.preventDefault(); // Prevent default touch behavior
+            if (twoFingerId !== null) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === twoFingerId) {
+                        twoFingerId = null;
+                        twoFingerStartX = null;
+                        break;
+                    }
+                }
+            }
+            if (e.touches.length > 0) {
+                // Some fingers are still on screen (e.g. one of two lifted); wait for full lift.
+                return;
+            }
+            if (multiTouchSeen) {
+                multiTouchSeen = false;
+                twoFingerId = null;
+                twoFingerStartX = null;
+                lastTouchX = null;
+                lastTouchY = null;
+                firstTouchX = null;
+                firstTouchY = null;
+                touchpad.classList.remove('active'); // Remove visual feedback
+                return;
+            }
             lastTouchX = null;
             lastTouchY = null;
             const finalTouchX = e.changedTouches[0].clientX;
@@ -788,6 +841,9 @@
 
         touchpad.addEventListener('touchcancel', (e) => {
             e.preventDefault();
+            multiTouchSeen = false;
+            twoFingerId = null;
+            twoFingerStartX = null;
             lastTouchX = null;
             lastTouchY = null;
             firstTouchX=null;
@@ -813,6 +869,59 @@
                 }
             });
         }
+
+        // --- NEW: Swipe-to-switch tab navigation ---
+        const TAB_ORDER = ['touch', 'media', 'browser', 'type', 'log'];
+        const twoFingerThreshold = 60;
+        let twoFingerId = null;
+        let twoFingerStartX = null;
+        let multiTouchSeen = false;
+        let contentSwipeX = null;
+        let contentSwipeY = null;
+
+        function currentTabName() {
+            const active = document.querySelector('.panel.active');
+            return active ? active.id.replace('panel-', '') : 'touch';
+        }
+
+        function switchTabRelative(delta) {
+            const idx = TAB_ORDER.indexOf(currentTabName());
+            const next = TAB_ORDER[(idx + delta + TAB_ORDER.length) % TAB_ORDER.length];
+            switchTab(next);
+        }
+
+        // Horizontal swipe anywhere on the content (not on the touchpad, not in text fields)
+        // switches tabs. Single-finger gestures on the touchpad keep their own meaning;
+        // two fingers on the touchpad also switch tabs.
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.closest('#touchpad')) return;
+            if (e.target.closest('input, textarea, select')) return;
+            contentSwipeX = e.touches[0].clientX;
+            contentSwipeY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (contentSwipeX === null) return;
+            const t = e.touches[0];
+            const dx = t.clientX - contentSwipeX;
+            const dy = t.clientY - contentSwipeY;
+            if (Math.abs(dx) > 30 && Math.abs(dx) > Math.abs(dy)) {
+                e.preventDefault(); // horizontal intent: suppress scroll and the synthetic click
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (contentSwipeX === null) return;
+            const t = e.changedTouches[0];
+            const dx = t.clientX - contentSwipeX;
+            const dy = t.clientY - contentSwipeY;
+            contentSwipeX = null;
+            contentSwipeY = null;
+            if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+                switchTabRelative(dx < 0 ? 1 : -1);
+            }
+        }, { passive: true });
+        // --- END NEW: Swipe-to-switch tab navigation ---
         document.querySelectorAll('.tab-btn').forEach(btn => {
             btn.addEventListener('click', () => switchTab(btn.dataset.tab));
         });
