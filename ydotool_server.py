@@ -12,7 +12,7 @@ import traceback
 YDOTool_CMD_PREFIX = ["ydotool"]
 
 # Default capture scale for the 'screenshot' command (grim multiplies the resolution).
-DEFAULT_SCREENSHOT_SCALE = 0.25
+DEFAULT_SCREENSHOT_SCALE = 1.0
 
 # NEW: Character mapping for ydotool, since it uses a different syntax.
 YDOTool_CHAR_MAP = {
