@@ -107,6 +107,34 @@
             user-select: none; /* Prevent text selection on touch */
             -webkit-user-select: none; /* For Safari */
             touch-action: none; /* Prevent default browser touch actions like scrolling/zooming */
+            position: relative;
+            overflow: hidden;
+        }
+        #screenPreview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+            display: none;
+            background-color: #1b1b1b;
+            z-index: 1;
+        }
+        #touchpad.have-screen #screenPreview {
+            display: block;
+        }
+        #touchpad.have-screen p {
+            display: none;
+        }
+        #shotBtn {
+            flex: 0 0 auto;
+            height: auto;
+            width: auto;
+            padding: 6px 18px;
+            font-size: 1rem;
+            border-radius: 8px;
         }
         #touchpad.active {
             background-color: #dbe4e6; /* Slightly darker when active */
@@ -366,6 +394,12 @@
             </div>
             <div id="touchpad">
                 <p>Touch to click, swing to move mouse</p>
+                <img id="screenPreview" alt="">
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button id="shotBtn" onclick="sendCommand('screenshot', {scale: 0.25})">📷 Screenshot</button>
+                </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
@@ -576,6 +610,7 @@
             }
 
             ws = new WebSocket(url);
+            ws.binaryType = 'arraybuffer'; // receive the screenshot PNG as binary
 
             ws.onopen = function() {
                 statusIndicator.classList.add('connected');
@@ -587,6 +622,10 @@
             };
 
             ws.onmessage = function(event) {
+                if (event.data instanceof ArrayBuffer) {
+                    renderScreenPreview(event.data);
+                    return;
+                }
                 try {
                     const response = JSON.parse(event.data);
                     if (response.status === 'success') {
@@ -676,6 +715,8 @@
         
         // --- NEW: Touchpad Logic ---
         const touchpad = document.getElementById('touchpad');
+        const screenPreview = document.getElementById('screenPreview');
+        let lastPreviewUrl = null;
         let lastTouchX = null;
         let lastTouchY = null;
         let firstTouchX = null;
@@ -686,6 +727,22 @@
 
         const scrollSensitivity = 0.03;
         let currentTouchpadMode = 'mouse';
+
+        // --- NEW: Screen preview on the touchpad ---
+        function renderScreenPreview(buf) {
+            if (!screenPreview) return;
+            try {
+                const blob = new Blob([buf], { type: 'image/png' });
+                const url = URL.createObjectURL(blob);
+                if (lastPreviewUrl) URL.revokeObjectURL(lastPreviewUrl);
+                screenPreview.src = url;
+                lastPreviewUrl = url;
+                touchpad.classList.add('have-screen');
+            } catch (err) {
+                console.log('preview render error:', err);
+            }
+        }
+        // --- END NEW: Screen preview on the touchpad ---
 
         // Function to set the active mode and update button styles
         function setActiveMode(mode) {

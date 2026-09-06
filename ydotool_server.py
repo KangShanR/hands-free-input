@@ -11,6 +11,9 @@ import traceback
 # This makes the code cleaner and easier to read.
 YDOTool_CMD_PREFIX = ["ydotool"]
 
+# Default capture scale for the 'screenshot' command (grim multiplies the resolution).
+DEFAULT_SCREENSHOT_SCALE = 0.25
+
 # NEW: Character mapping for ydotool, since it uses a different syntax.
 YDOTool_CHAR_MAP = {
     '<': ['shift', 'comma'],
@@ -151,6 +154,7 @@ async def handle_message(websocket):
                 args = command_data.get('args', {})
 
                 response = {"status": "success", "message": "Command executed successfully.", "command": command}
+                binary_reply_sent = False
 
                 if command == 'type':
                     text_to_type = args.get('text', '')
@@ -273,11 +277,25 @@ async def handle_message(websocket):
                     else:
                         response["status"] = "error"
                         response["message"] = "Command not specified."
+                elif command == 'screenshot':
+                    scale = args.get('scale', DEFAULT_SCREENSHOT_SCALE)
+                    proc = await asyncio.create_subprocess_exec(
+                        'grim', '-s', str(scale), '-',
+                        stdout=asyncio.subprocess.PIPE,
+                        stderr=asyncio.subprocess.DEVNULL)
+                    png_bytes, _ = await proc.communicate()
+                    if proc.returncode == 0 and png_bytes:
+                        await websocket.send(png_bytes)
+                        binary_reply_sent = True
+                    else:
+                        response["status"] = "error"
+                        response["message"] = f"grim capture failed (exit {proc.returncode})."
                 else:
                     response["status"] = "error"
                     response["message"] = f"Unknown command: {command}"
 
-                await websocket.send(json.dumps(response))
+                if not binary_reply_sent:
+                    await websocket.send(json.dumps(response))
 
             except json.JSONDecodeError:
                 print(f"Invalid JSON received: {message}")
