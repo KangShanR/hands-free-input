@@ -404,6 +404,12 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['win', 'shift', 'Enter']})">Browser</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['win', 'alt', 'Enter']})">Tmux</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
                     <button onclick="sendCommand('hotkey', {keys: ['win', 'f']})">🪟 Full</button>
                     <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
                 </div>
