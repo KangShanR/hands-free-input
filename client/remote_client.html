@@ -536,9 +536,6 @@
             p.classList.add(`message-${type}`);
             messagesDiv.appendChild(p);
             messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
-            if (type === 'error' && typeof switchTab === 'function') {
-                switchTab('log'); // NEW: auto-open the Log tab on errors
-            }
         }
 
         function connectServer() {
