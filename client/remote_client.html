@@ -456,18 +456,6 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'a']})">All</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'space']})">🔃 Keyboard</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: 'backspace'})">Backspace</button>
-                    <button onclick="sendCommand('press', {key: 'delete'})">Del</button>
-                </div>
-            </div>
-            <div class="input-group">
-                <div class="input-fields">
                     <button onclick="sendCommand('press', {key: 'f2'})">F2</button>
                     <button onclick="sendCommand('press', {key: 'f5'})">F5</button>
                     <button onclick="sendCommand('press', {key: 'f6'})">F6</button>
@@ -485,6 +473,18 @@
         </div>
 
         <div class="panel" id="panel-type">
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'a']})">All</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'space']})">🔃 Keyboard</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button onclick="sendCommand('press', {key: 'backspace'})">Backspace</button>
+                    <button onclick="sendCommand('press', {key: 'delete'})">Del</button>
+                </div>
+            </div>
             <div class="input-group">
                 <div class="input-fields">
                     <input type="text" placeholder="text some" id="typeText">
