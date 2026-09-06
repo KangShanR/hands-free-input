@@ -409,6 +409,18 @@
                     <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
                 </div>
             </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                </div>
+            </div>
         </div>
 
         <div class="panel" id="panel-browser">
@@ -464,10 +476,14 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
                 </div>
             </div>
         </div>
