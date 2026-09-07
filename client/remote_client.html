@@ -749,7 +749,13 @@
         let count = 0; // 用于节流的计时器变量
         const DIVIDER = 5; 
 
-        const scrollSensitivity = 0.03;
+        const SCROLL_NOTCH_PX = 24; // pixels of drag that equal one wheel notch
+        // Direction multipliers for the wheel. If scrolling feels inverted on the
+        // host, flip these to -1 / +1.
+        const SCROLL_DIR_V = -1; // +: drag down scrolls content down (natural)
+        const SCROLL_DIR_H = 1;  // +: drag right pans content right
+        let scrollAccX = 0; // accumulated drag pixels for horizontal wheel
+        let scrollAccY = 0; // accumulated drag pixels for vertical wheel
         let currentTouchpadMode = 'mouse';
 
         // --- NEW: Screen preview on the touchpad ---
@@ -786,6 +792,8 @@
             initialTouchY = null;
             lastTouchX = null;
             lastTouchY = null;
+            scrollAccX = 0;
+            scrollAccY = 0;
             touchpad._lastSentX = null;
             touchpad._lastSentY = null;
             touchpad.classList.remove('active');
@@ -814,6 +822,8 @@
             }
             if (e.touches.length === 1) {
                 count ++;
+                scrollAccX = 0;
+                scrollAccY = 0;
                 lastTouchX = e.touches[0].clientX;
                 lastTouchY = e.touches[0].clientY;
                 firstTouchX = e.touches[0].clientX;
@@ -844,6 +854,30 @@
                         twoFingerStartX = null;
                         switchTabRelative(1);
                     }
+                }
+                return;
+            }
+            if (e.touches.length === 1 && lastTouchX !== null &&
+                    currentTouchpadMode == 'scroll') {
+                // Stream real wheel notches while the finger drags.
+                const curX = e.touches[0].clientX;
+                const curY = e.touches[0].clientY;
+                const rawDX = curX - lastTouchX;
+                const rawDY = curY - lastTouchY;
+                lastTouchX = curX;
+                lastTouchY = curY;
+                scrollAccX += rawDX;
+                scrollAccY += rawDY;
+
+                const notchesY = Math.trunc(scrollAccY / SCROLL_NOTCH_PX);
+                if (notchesY !== 0) {
+                    scrollAccY -= notchesY * SCROLL_NOTCH_PX;
+                    sendCommand('scroll', { clicks: SCROLL_DIR_V * notchesY });
+                }
+                const notchesX = Math.trunc(scrollAccX / SCROLL_NOTCH_PX);
+                if (notchesX !== 0) {
+                    scrollAccX -= notchesX * SCROLL_NOTCH_PX;
+                    sendCommand('hscroll', { clicks: SCROLL_DIR_H * notchesX });
                 }
                 return;
             }
@@ -890,11 +924,15 @@
                 lastTouchY = null;
                 firstTouchX = null;
                 firstTouchY = null;
+                scrollAccX = 0;
+                scrollAccY = 0;
                 touchpad.classList.remove('active'); // Remove visual feedback
                 return;
             }
             lastTouchX = null;
             lastTouchY = null;
+            scrollAccX = 0;
+            scrollAccY = 0;
             const finalTouchX = e.changedTouches[0].clientX;
             const finalTouchY = e.changedTouches[0].clientY;
 
@@ -933,17 +971,6 @@
                             logMessage('Array Mode: Swiped Up (Arrow Up)', 'info');
                         }
                     }
-                }else if (currentTouchpadMode == 'scroll'){
-                    // Normalize deltaY to a reasonable scroll amount
-                    if(Math.abs(deltaX) > Math.abs(deltaY)){
-                        const scrollAmount = Math.round(deltaX * scrollSensitivity); 
-                        sendCommand('hscroll', { clicks: -scrollAmount }); // Negative for scroll down (positive deltaY)
-                        logMessage(`Touchpad: Horizontally scrolled ${scrollAmount} clicks (Scroll Mode).`, 'info');
-                    }else{
-                        const scrollAmount = Math.round(deltaY * scrollSensitivity); 
-                        sendCommand('scroll', { clicks: scrollAmount }); // Negative for scroll down (positive deltaY)
-                        logMessage(`Touchpad: Vertibally scrolled ${scrollAmount} clicks (Scroll Mode).`, 'info');
-                    }
                 }
 
             }
@@ -957,8 +984,10 @@
             twoFingerStartX = null;
             lastTouchX = null;
             lastTouchY = null;
-            firstTouchX=null;
-            firstTouchY=null
+            firstTouchX = null;
+            firstTouchY = null;
+            scrollAccX = 0;
+            scrollAccY = 0;
             touchpad.classList.remove('active');
         });
         // --- END NEW Touchpad Logic ---

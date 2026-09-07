@@ -14,6 +14,68 @@ YDOTool_CMD_PREFIX = ["ydotool"]
 # Default capture scale for the 'screenshot' command (grim multiplies the resolution).
 DEFAULT_SCREENSHOT_SCALE = 1.0
 
+# Global wheel direction multiplier. Flip to -1 if the host interprets the
+# wheel sign the other way around.
+WHEEL_DIR = 1
+
+try:
+    from evdev import UInput, ecodes as ecode
+    HAVE_EVDEV = True
+except Exception:
+    HAVE_EVDEV = False
+
+
+class WheelEmitter:
+    """Real mouse-wheel emitter through a virtual uinput device.
+
+    ydotool itself cannot emit wheel (REL_WHEEL) events, so we open our own
+    uinput device. The server process needs write access to /dev/uinput
+    (the 'input' group provides it here).
+    """
+
+    def __init__(self):
+        self.available = False
+        self._ui = None
+        if not HAVE_EVDEV:
+            print("WheelEmitter: python-evdev not available, real wheel disabled.")
+            return
+        try:
+            self._ui = UInput(
+                {ecode.EV_REL: [ecode.REL_WHEEL, ecode.REL_HWHEEL]},
+                name='hfi-virtual-wheel',
+                bustype=ecode.BUS_VIRTUAL,
+            )
+            self.available = True
+            print("WheelEmitter: virtual wheel device created.")
+        except Exception as e:
+            print(f"WheelEmitter: failed to create device: {e}")
+
+    def scroll(self, clicks):
+        """Positive clicks scroll content down."""
+        if not self.available or not clicks:
+            return False
+        self._ui.write(ecode.EV_REL, ecode.REL_WHEEL, int(clicks))
+        self._ui.syn()
+        return True
+
+    def hscroll(self, clicks):
+        """Positive clicks scroll content to the right."""
+        if not self.available or not clicks:
+            return False
+        self._ui.write(ecode.EV_REL, ecode.REL_HWHEEL, int(clicks))
+        self._ui.syn()
+        return True
+
+
+_wheel = None
+
+
+def get_wheel():
+    global _wheel
+    if _wheel is None:
+        _wheel = WheelEmitter()
+    return _wheel
+
 # NEW: Character mapping for ydotool, since it uses a different syntax.
 YDOTool_CHAR_MAP = {
     '<': ['shift', 'comma'],
@@ -225,42 +287,26 @@ async def handle_message(websocket):
                     response["message"] = f"Clicked with button '{args.get('button', 'left')}'"
                 elif command == 'scroll':
                     clicks = args.get('clicks', 0)
-                    # For scroll, we can map to mouse wheel commands
-                    # Scroll up
-                    if clicks > 0:
-                        code = KEY_MAPPING.get('up')
-                        codes = [f'{code}:1', f'{code}:0']
-                        execute_ydotool_command(['key'] + [item for _ in range(clicks) for item in codes])
-                        response["message"] = f"Scrolled by {clicks} clicks"
-                    # Scroll down
-                    elif clicks < 0:
-                        code = KEY_MAPPING.get('down')
-                        codes = [f'{code}:1', f'{code}:0']
-                        execute_ydotool_command(['key'] + [item for _ in range(-clicks) for item in codes])
+                    clicks = max(-20, min(20, int(WHEEL_DIR * clicks)))
+                    wheel = get_wheel()
+                    if clicks == 0:
+                        response["message"] = "Nothing to scroll (clicks=0)."
+                    elif wheel.available and wheel.scroll(clicks):
                         response["message"] = f"Scrolled by {clicks} clicks"
                     else:
-                        button = 'C0'
-                        execute_ydotool_command(['click', button])
-                        response["message"] = "It's a click, not a scroll."
+                        response["status"] = "error"
+                        response["message"] = "Wheel device unavailable."
                 elif command == 'hscroll':
                     clicks = args.get('clicks', 0)
-                    # For scroll, we can map to mouse wheel commands
-                    # Scroll right
-                    if clicks > 0:
-                        code = KEY_MAPPING.get('right')
-                        codes = [f'{code}:1', f'{code}:0']
-                        execute_ydotool_command(['key'] + [item for _ in range(clicks) for item in codes])
-                        response["message"] = f"Scrolled by {clicks} clicks"
-                    # Scroll left
-                    elif clicks < 0:
-                        code = KEY_MAPPING.get('left')
-                        codes = [f'{code}:1', f'{code}:0']
-                        execute_ydotool_command(['key'] + [item for _ in range(-clicks) for item in codes])
-                        response["message"] = f"Scrolled by {clicks} clicks"
+                    clicks = max(-20, min(20, int(WHEEL_DIR * clicks)))
+                    wheel = get_wheel()
+                    if clicks == 0:
+                        response["message"] = "Nothing to hscroll (clicks=0)."
+                    elif wheel.available and wheel.hscroll(clicks):
+                        response["message"] = f"HScrolled by {clicks} clicks"
                     else:
-                        button = 'C0'
-                        execute_ydotool_command(['click', button])
-                        response["message"] = "It's a click, not a scroll."
+                        response["status"] = "error"
+                        response["message"] = "Wheel device unavailable."
                 elif command == 'exec':
                     # This command is system-specific and doesn't change with ydotool
                     cmd_to_exec = args.get('command')
