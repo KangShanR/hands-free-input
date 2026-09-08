@@ -136,6 +136,17 @@
             font-size: 1rem;
             border-radius: 8px;
         }
+        #digitWheel {
+            flex: 1 1 0;
+            height: 100px;
+            font-size: 2rem;
+            text-align: center;
+            background-color: #fff;
+            color: #333;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 0 10px;
+        }
         #touchpad.active {
             background-color: #dbe4e6; /* Slightly darker when active */
         }
@@ -489,6 +500,23 @@
                 <div class="input-fields">
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
                     <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                </div>
+            </div>
+            <div class="input-group">
+                <div class="input-fields">
+                    <select id="digitWheel">
+                        <option value="0" selected>0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                    </select>
+                    <button onclick="sendCommand('press', {key: document.getElementById('digitWheel').value})">Go</button>
                 </div>
             </div>
         </div>
