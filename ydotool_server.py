@@ -326,7 +326,7 @@ async def handle_message(websocket):
                 elif command == 'screenshot':
                     scale = args.get('scale', DEFAULT_SCREENSHOT_SCALE)
                     proc = await asyncio.create_subprocess_exec(
-                        'grim', '-s', str(scale), '-',
+                        'grim', '-c', '-s', str(scale), '-',
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.DEVNULL)
                     png_bytes, _ = await proc.communicate()
