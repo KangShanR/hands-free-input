@@ -661,11 +661,65 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight; // Auto-scroll to bottom
         }
 
+        const HEARTBEAT_MS = 5000;      // send a ping this often while visible
+        const PONG_TIMEOUT_MS = 4000;   // reconnect if no reply within this time
+        const RECONNECT_DELAY_MS = 2000;
+        let intentionalClose = false;
+        let reconnectTimer = null;
+        let heartbeatTimer = null;
+        let pingSentAt = 0;
+        let awaitingPong = false;
+
+        function stopHeartbeat() {
+            if (heartbeatTimer) {
+                clearInterval(heartbeatTimer);
+                heartbeatTimer = null;
+            }
+            awaitingPong = false;
+        }
+
+        function startHeartbeat() {
+            stopHeartbeat();
+            heartbeatTimer = setInterval(() => {
+                if (!ws || ws.readyState !== WebSocket.OPEN) return;
+                if (document.visibilityState !== 'visible') return;
+                if (awaitingPong) {
+                    if (Date.now() - pingSentAt > PONG_TIMEOUT_MS) {
+                        logMessage('连接已超时，正在重连……', 'error');
+                        awaitingPong = false;
+                        try { ws.close(); } catch (e) {}
+                    }
+                    return;
+                }
+                try {
+                    ws.send(JSON.stringify({ command: 'ping', args: {} }));
+                    pingSentAt = Date.now();
+                    awaitingPong = true;
+                } catch (e) {}
+            }, HEARTBEAT_MS);
+        }
+
+        function scheduleReconnect() {
+            if (intentionalClose || reconnectTimer) return;
+            reconnectTimer = setTimeout(() => {
+                reconnectTimer = null;
+                if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
+                    connectServer();
+                }
+            }, RECONNECT_DELAY_MS);
+        }
+
         function connectServer() {
             const ip = serverIpInput.value;
             const port = serverPortInput.value;
             const url = `ws://${ip}:${port}`;
-            
+
+            intentionalClose = false;
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
+
             logMessage('正在连接服务器……', 'info');
             if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
                 logMessage('已连接或正在连接。', 'info');
@@ -682,9 +736,12 @@
                 logMessage('已连接到服务器。', 'info');
                 connectBtn.disabled = true;
                 disconnectBtn.disabled = false;
+                awaitingPong = false;
+                startHeartbeat();
             };
 
             ws.onmessage = function(event) {
+                awaitingPong = false; // any traffic means the link is alive
                 if (event.data instanceof ArrayBuffer) {
                     renderScreenPreview(event.data);
                     return;
@@ -702,12 +759,14 @@
             };
 
             ws.onclose = function() {
+                stopHeartbeat();
                 statusIndicator.classList.remove('connected');
                 statusText.textContent = '未连接';
                 statusText.style.color = 'red';
                 logMessage('与服务器断开连接。', 'info');
                 connectBtn.disabled = false;
                 disconnectBtn.disabled = true;
+                scheduleReconnect();
             };
             
             ws.onerror = function(error) {
@@ -717,11 +776,16 @@
                 statusText.style.color = 'orange';
                 connectBtn.disabled = false;
                 disconnectBtn.disabled = true;
-                connectServer();
+                // onclose 会随后触发并安排重连。
             };
         };
 
         disconnectBtn.onclick = function() {
+            intentionalClose = true;
+            if (reconnectTimer) {
+                clearTimeout(reconnectTimer);
+                reconnectTimer = null;
+            }
             if (ws && ws.readyState === WebSocket.OPEN) {
                 ws.close();
             }
@@ -731,22 +795,24 @@
         // connectBtn.addEventListener('click', connectServer);
         document.addEventListener('DOMContentLoaded', () => {
             // NEW: Automatically connect to server on page load
-            connectBtn.onclick(); 
+            connectServer();
         })
 
         document.addEventListener('visibilitychange', function() {
-            const statusSpan = document.getElementById('visibilityStatus');
-
             if (document.visibilityState === 'hidden') {
                 // 页面变为不可见时执行的代码
                 logMessage('页面已隐藏。', 'info');
             } else {
                 // 页面变为可见时执行的代码
                 logMessage('页面已恢复。', 'info');
-                if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-                    logMessage('页面恢复：已连接或正在连接。', 'info');
-                    return;
-                }else{
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    // 后台冻结后 OPEN 状态可能已失效，主动探活。
+                    try {
+                        ws.send(JSON.stringify({ command: 'ping', args: {} }));
+                        pingSentAt = Date.now();
+                        awaitingPong = true;
+                    } catch (e) {}
+                } else if (!ws || ws.readyState === WebSocket.CLOSED || ws.readyState === WebSocket.CLOSING) {
                     logMessage('页面恢复：正在重新连接。', 'info');
                     connectServer();
                 }
