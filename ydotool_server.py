@@ -336,8 +336,6 @@ async def handle_message(websocket):
                     else:
                         response["status"] = "error"
                         response["message"] = f"grim capture failed (exit {proc.returncode})."
-                elif command == 'ping':
-                    response["message"] = "pong"
                 else:
                     response["status"] = "error"
                     response["message"] = f"Unknown command: {command}"
