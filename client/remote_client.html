@@ -435,18 +435,18 @@
             <div class="input-group">
                 <div class="input-fields">
                     <button onclick="sendCommand('hotkey', {keys: ['win', 'f']})">🪟 全屏</button>
-                    <button onclick="sendCommand('press', {key: 'esc'})">Esc</button>
+                    <button onclick="sendCommand('press', {key: 'esc'})">Esc退出</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['win', 'left']})">◀ 窗口</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['win', 'right']})">窗口 ▶</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['win', 'left']})">◀ 去左窗口</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['win', 'right']})">去右窗口 ▶</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['win', 'shift', 'left']})">◀◀ 窗口</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['win', 'shift', 'left']})">◀◀ 窗口左移</button>
                     <button onclick="sendCommand('hotkey', {keys: ['win', 'shift', 'right']})">窗口 ▶▶</button>
                 </div>
             </div>
@@ -461,15 +461,15 @@
         <div class="panel" id="panel-media">
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: 'volumeup'})">🔊</button>
-                    <button onclick="sendCommand('press', {key: 'volumedown'})">🔈</button>
+                    <button onclick="sendCommand('press', {key: 'volumeup'})">🔊提高音量</button>
+                    <button onclick="sendCommand('press', {key: 'volumedown'})">🔈降低音量</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: 'prevtrack'})">⏮</button>
-                    <button onclick="sendCommand('press', {key: 'playpause'})">⏯</button>
-                    <button onclick="sendCommand('press', {key: 'nexttrack'})">⏭</button>
+                    <button onclick="sendCommand('press', {key: 'prevtrack'})">⏮上一位</button>
+                    <button onclick="sendCommand('press', {key: 'playpause'})">⏯暂停/播放</button>
+                    <button onclick="sendCommand('press', {key: 'nexttrack'})">⏭下一位</button>
                 </div>
             </div>
             <div class="input-group">
@@ -480,33 +480,33 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: '/'})">/</button>
-                    <button onclick="sendCommand('press', {key: 'c'})">C</button>
+                    <button onclick="sendCommand('press', {key: '/'})">/搜索</button>
+                    <button onclick="sendCommand('press', {key: 'c'})">C字幕</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: 'f'})">F</button>
-                    <button onclick="sendCommand('press', {key: 'v'})">v</button>
-                    <button onclick="sendCommand('press', {key: 'i'})">I</button>
+                    <button onclick="sendCommand('press', {key: 'f'})">F全屏</button>
+                    <button onclick="sendCommand('press', {key: 'v'})">v推荐</button>
+                    <button onclick="sendCommand('press', {key: 'i'})">I小画面</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: '&gt;'})">&gt;</button>
-                    <button onclick="sendCommand('press', {key: '&lt;'})">&lt;</button>
+                    <button onclick="sendCommand('press', {key: '&gt;'})">&gt;快进</button>
+                    <button onclick="sendCommand('press', {key: '&lt;'})">&lt;慢放</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">上翻页</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">头部</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">下翻页</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">末尾</button>
                 </div>
             </div>
             <div class="input-group">
@@ -523,7 +523,7 @@
                         <option value="8">8</option>
                         <option value="9">9</option>
                     </select>
-                    <button onclick="sendCommand('press', {key: document.getElementById('digitWheel').value})">执行</button>
+                    <button onclick="sendCommand('press', {key: document.getElementById('digitWheel').value})">去吧</button>
                 </div>
             </div>
         </div>
@@ -537,20 +537,20 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 't']})">📄➕</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">📄❌</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 't']})">📄➕新建页面</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'w']})">📄❌关闭此页</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'tab']})">📄⏭️</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'tab']})">📄⏮️</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'tab']})">📄⏭️后页</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', 'tab']})">📄⏮️前页</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', '-']})">🔎-</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', '=']})">🔎+</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', '-']})">🔎-缩小</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['ctrl', 'shift', '=']})">🔎+放大</button>
                 </div>
             </div>
             <div class="input-group">
@@ -567,8 +567,8 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button onclick="sendCommand('press', {key: 'tab'})">Tab</button>
-                    <button onclick="sendCommand('hotkey', {keys: ['shift', 'tab']})">⇧Tab</button>
+                    <button onclick="sendCommand('press', {key: 'tab'})">Tab切换</button>
+                    <button onclick="sendCommand('hotkey', {keys: ['shift', 'tab']})">⇧Tab反向切换</button>
                 </div>
             </div>
             <div class="input-group">
@@ -581,14 +581,14 @@
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">PgUp</button>
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">Home</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pageup'})">上翻页</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'home'})">首</button>
                 </div>
             </div>
             <div class="input-group">
                 <div class="input-fields">
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">PgDn</button>
-                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">End</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'pagedown'})">下翻页</button>
+                    <button class="arrayBtn" onclick="sendCommand('press', {key: 'end'})">末</button>
                 </div>
             </div>
         </div>
